@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>To-Do List</title>
+    <link rel="stylesheet" href="/app/style.css">
+  </head>
+  <body>
+
+    <div class="page">
+
+      <div class="app">
+        <div class="app-header">
+          <img class="todo-logo" src="/app/images/todo-logo.png">
+        </div>
+
+        <div class="app-body">
+          <aside class="sidebar">
+            <nav>
+              <ul class="sidebar-nav">
+                <li><button type="button" class="nav-link is-active" data-filter="Home">Home</button></li>
+                <li><button type="button" class="nav-link" data-filter="Today">Today</button></li>
+                <li><button type="button" class="nav-link" data-filter="Week">Week</button></li>
+                <li class="nav-label">Projects</li>
+                <li><button type="button" class="nav-link">Notes</button></li>
+              </ul>
+              <button type="button" class="add-button">+</button>
+            </nav>
+
+          </aside>
+
+          <main class="todo-panel">
+            <form id="todo-form" class="todo-form is-hidden">
+                <input id="title" type="text" placeholder="Title" required>
+                <input id="details" type="text" placeholder="Details">
+                <input id="due_date" type="date">
+                <select id="priority" required>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                </select>
+                <button type="submit">Add</button>
+            </form>
+            <ul id="todo-list"></ul>
+          </main>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="/app/main.js"></script>
+  </body>
+</html>

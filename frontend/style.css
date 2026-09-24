@@ -1,0 +1,158 @@
+* {
+    box-sizing: border-box;
+  }
+  
+  html, body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden; /* safety for horizontal bar */
+  }
+
+.page {
+    min-height: 100vh;
+    width: 100%;
+    background-image: url('/app/images/bg.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .app {
+    width: min(1050px, 95vw);
+    height: min(630px, 80vh);
+    background: #f7f4f4;
+    box-shadow: 0 16px 40px 0 rgba(0, 0, 0, 0.4);
+    border: 1.5px solid #c7c9ca;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    /* looks like a floating screen */
+  }
+
+  .app-body {
+    flex: 1;
+    display: flex;
+    min-height: 0;
+  }
+
+  .app-header {
+    background-color: #d189ab;
+    margin: 0 auto;
+    width: 100%;
+    height: 55px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #d2d8da;  
+    border-radius: 10px 10px 0 0;
+  }
+
+.todo-logo {
+    width: 250px;
+    height: 50px;
+    padding-left: 20px;
+}
+
+.todo-panel {
+  flex: 1;
+  background: #f7f4f4;
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+.sidebar {
+  width: 260px;
+  background: #ecebeb;
+  border-right: 1.5px solid #afb1b1;
+}
+
+.sidebar-nav {
+  list-style: none;
+  margin: 0;
+  padding: 2rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem; /* even space between ALL items */
+}
+
+.nav-link {
+  width: 100%;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  border: none;
+  background: transparent;
+  padding: 0 1rem 0 1.5rem; /* same left edge for every link */
+  font-size: 1.25rem;
+  font-weight: 300;
+  font-family: system-ui, "Segoe UI", sans-serif;
+  color: #1d1c1c;
+  cursor: pointer;
+}
+
+.nav-link:hover,
+.nav-link.is-active {
+  font-weight: 500;
+  color: #4d324e;
+}
+
+/* // starts at that left edge, then pushes the word right */
+.nav-link::before {
+  content: "//";
+  display: inline-block;
+  max-width: 0;
+  overflow: hidden;
+  opacity: 0;
+  white-space: nowrap;
+  font-size: 1.3rem;
+  letter-spacing: -0.12rem;
+  margin-right: 0;
+  padding-right: 0.1em;
+  transition: max-width 0.2s ease, opacity 0.15s ease, margin-right 0.2s ease;
+}
+
+.nav-link:hover::before,
+.nav-link.is-active::before {
+  max-width: 2.5em;
+  opacity: 1;
+  margin-right: 0.35rem;
+}
+
+.nav-label {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  padding: 0 2rem 0 1.6rem;
+  font-size: 1.25rem;
+  font-weight: 300;
+  font-family: system-ui, "Segoe UI", sans-serif;
+  color: #1d1c1c;
+  cursor: default;
+}
+
+.add-button {
+  width: 50px;
+  height:50px;
+  border-radius: 50%;
+  background-color: #d189ab;
+  color: #fff;
+  font-size: 2.8rem;
+  line-height: 0.7;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(1, 1, 1, 0.4);
+  position: relative;
+  left: 40px;
+  bottom: -130px;
+}
+
+.is-hidden {
+  display: none;
+}
