@@ -1,4 +1,5 @@
 let currentFilter = "Home";
+let currentSort = "date";
 const form = document.getElementById("todo-form");
 const addButton = document.querySelector(".add-button");
 
@@ -43,6 +44,22 @@ async function loadTodos(){
     }
 
 
+    const priorityRank = { high: 0, medium: 1, low: 2 };
+
+    todos.sort((a, b) => {
+        if (currentSort === "priority") {
+            return priorityRank[a.priority] - priorityRank[b.priority];
+        }
+        if (currentSort === "newest") {
+            return b.id - a.id;
+        }
+        if (!a.due_date && !b.due_date) return 0;
+        if (!a.due_date) return 1;
+        if (!b.due_date) return -1;
+        return a.due_date.localeCompare(b.due_date);
+    });
+
+
     const list = document.getElementById("todo-list")
     list.innerHTML = "";
 
@@ -62,7 +79,7 @@ async function loadTodos(){
 
         const date = document.createElement("span");
         date.className = "todo-date";
-        date.textContent = todo.due_date ? formatDueDate(todo.due_date) : "";
+        date.textContent = todo.due_date ? formatDueDate(todo.due_date) : "N/A";
 
         li.classList.add(`priority-${todo.priority}`);
 
@@ -169,11 +186,41 @@ form.addEventListener("submit", async function(event) {
 }); 
 
 
+const createModal = document.getElementById("create-modal");
+const closeModal = document.querySelector(".modal-close");
+
+
 // toggle add form ( will change later )
 addButton.addEventListener("click", function() {
-    form.classList.toggle("is-hidden");
+    createModal.classList.remove("is-hidden");
 });
 
+closeModal.addEventListener("click", function() {
+    createModal.classList.add("is-hidden");
+});
+
+document.querySelectorAll(".modal-tab").forEach((tab) => {
+    tab.addEventListener("click", function () {
+      const name = tab.dataset.panel;
+  
+      document.querySelectorAll(".modal-tab").forEach((item) => {
+        item.classList.remove("is-active");
+      });
+      tab.classList.add("is-active");
+  
+      document.querySelectorAll(".modal-panel").forEach((panel) => {
+        panel.classList.toggle("is-hidden", panel.dataset.panel !== name);
+      });
+    });
+  });
+
+
+// sort select
+const sortSelect = document.getElementById("sort-select");
+sortSelect.addEventListener("change", function () {
+    currentSort = sortSelect.value;
+    loadTodos();
+});
 
 // filter buttons
 document.querySelectorAll(".nav-link[data-filter]").forEach((button) => {

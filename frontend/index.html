@@ -32,7 +32,39 @@
 
           </aside>
 
+          <!-- Modal (Add To Do , Project, Notes) -->
+           <div class="modal-overlay is-hidden" id="create-modal">
+            <div class="modal">
+              <header class="modal-header">
+                <h2 class="modal-title">Create a new...</h2>
+                <button type="button" class="modal-close" aria-label="Close">×</button>
+              </header>
+              <div class="modal-body">
+                <aside class="modal-nav">
+                  <button type="button" class="modal-tab is-active" data-panel="todo">To Do</button>
+                  <button type="button" class="modal-tab" data-panel="project">Project</button>
+                  <button type="button" class="modal-tab" data-panel="note">Note</button>
+                </aside>
+
+                <div class="modal-panels">
+                  <section class="modal-panel" data-panel="todo">To Do in development...</section>
+                  <section class="modal-panel is-hidden" data-panel="project">Projects in development...</section>
+                  <section class="modal-panel is-hidden" data-panel="note">Notes in development...</section>
+                </div>
+              </div>
+            </div>
+           </div>
+
           <main class="todo-panel">
+
+            <div class="list-sort">
+              <label class="sort-label"for="sort-select">Sort by:</label>
+              <select id="sort-select">
+                <option value="date">Date</option>
+                <option value="priority">Priority</option>
+                <option value="newest">Newest</option>
+              </select>
+            </div>
             <form id="todo-form" class="todo-form is-hidden">
                 <input id="title" type="text" placeholder="Title" required>
                 <input id="details" type="text" placeholder="Details">
