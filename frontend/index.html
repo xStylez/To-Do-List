@@ -47,7 +47,23 @@
                 </aside>
 
                 <div class="modal-panels">
-                  <section class="modal-panel" data-panel="todo">To Do in development...</section>
+                  <section class="modal-panel" data-panel="todo">
+                    <form id="todo-form" class="todo-form">
+                      <input id="title" type="text" class="todo-form-title-input" placeholder="Title: 'Shopping'" required>
+                      <textarea id="details" type="text" class="todo-form-details-input" placeholder="Details. eg. water bill, electricity bill, etc."></textarea>
+                      <div class="todo-form-row-date">
+                        <label for="due_date">Due Date:</label>
+                        <input id="due_date" type="date" class="todo-form-due-date-input">
+                      </div>
+                      <div class="todo-form-row-priority">
+                        <span>Priority:</span>
+                            <button type="button" class="priority-choice priority-choice-low" data-priority="low">Low</button>
+                            <button type="button" class="priority-choice priority-choice-medium" data-priority="medium">Medium</button>
+                            <button type="button" class="priority-choice priority-choice-high" data-priority="high">High</button>
+                            <button type="submit" class="todo-form-add-button">Add to List</button>
+                      </div>
+                  </form>
+                  </section>
                   <section class="modal-panel is-hidden" data-panel="project">Projects in development...</section>
                   <section class="modal-panel is-hidden" data-panel="note">Notes in development...</section>
                 </div>
@@ -65,17 +81,6 @@
                 <option value="newest">Newest</option>
               </select>
             </div>
-            <form id="todo-form" class="todo-form is-hidden">
-                <input id="title" type="text" placeholder="Title" required>
-                <input id="details" type="text" placeholder="Details">
-                <input id="due_date" type="date">
-                <select id="priority" required>
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
-                </select>
-                <button type="submit">Add</button>
-            </form>
             <ul id="todo-list"></ul>
           </main>
 

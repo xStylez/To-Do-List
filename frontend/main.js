@@ -164,7 +164,7 @@ form.addEventListener("submit", async function(event) {
 
     const title = document.getElementById("title").value;
     const details = document.getElementById("details").value;
-    const priority = document.getElementById("priority").value;
+    const priority = document.querySelector(".priority-choice.is-selected").dataset.priority;
     const due_date = document.getElementById("due_date").value || null;
 
     const response = await fetch("http://127.0.0.1:5000/todos", {
@@ -185,6 +185,14 @@ form.addEventListener("submit", async function(event) {
     await loadTodos();
 }); 
 
+document.querySelectorAll(".priority-choice").forEach((button) => {
+    button.addEventListener("click", function () {
+      document.querySelectorAll(".priority-choice").forEach((item) => {
+        item.classList.remove("is-selected");
+      });
+      button.classList.add("is-selected");
+    });
+  });
 
 const createModal = document.getElementById("create-modal");
 const closeModal = document.querySelector(".modal-close");
