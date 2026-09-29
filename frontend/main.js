@@ -1,5 +1,6 @@
 let currentFilter = "Home";
 let currentSort = "date";
+let currentProjectId = null;
 const form = document.getElementById("todo-form");
 const addButton = document.querySelector(".add-button");
 
@@ -43,6 +44,13 @@ async function loadTodos(){
         });
     }
 
+    if (currentFilter === "Project"){
+        todos = todos.filter((todo) => todo.project_id === currentProjectId);
+    }
+
+    const isProject = currentFilter === "Project";
+    document.getElementById("empty-project").classList.toggle("is-hidden", !(isProject && todos.length === 0));
+    document.getElementById("delete-project").classList.toggle("is-hidden", !(isProject && todos.length > 0));
 
     const priorityRank = { high: 0, medium: 1, low: 2 };
 
@@ -156,8 +164,72 @@ async function loadTodos(){
     }
 }
 
-loadTodos();
+async function loadProjects(){
+    const response = await fetch("http://127.0.0.1:5000/projects");
+    const data = await response.json();
 
+    const list = document.querySelector(".projects-list");
+    list.innerHTML = "";
+
+    for (const project of data.projects){
+        const li = document.createElement("li");
+        const button = document.createElement("button");
+        const label = document.createElement("span");
+        label.className = "nav-projects-name";
+        label.textContent = project.name;
+        button.type = "button";
+        button.className = "nav-projects";
+        
+        button.dataset.projectId = project.id;
+
+        button.addEventListener("click", function () {
+            currentProjectId = Number(button.dataset.projectId);
+            currentFilter = "Project";
+            document.querySelectorAll(".nav-link, .nav-projects").forEach((link) => {
+                link.classList.remove("is-active");
+            });
+            button.classList.add("is-active");
+            loadTodos();
+        });
+        li.appendChild(button);
+        list.appendChild(li);
+        button.appendChild(label);
+    }
+}
+
+loadTodos(); 
+loadProjects();
+
+const projectsToggle = document.getElementById("projects-label");
+const projectsList = document.querySelector(".projects-list");
+
+projectsToggle.addEventListener("click", function () {
+  projectsList.classList.toggle("is-hidden");
+});
+
+async function deleteCurrentProject() {
+    const response = await fetch(`http://127.0.0.1:5000/projects/${currentProjectId}`, {
+        method: "DELETE"
+    });
+
+    if (!response.ok) {
+        const err = await response.json();
+        alert(err.error || "Failed to delete project");
+        return;
+    }
+
+    currentProjectId = null;
+    currentFilter = "Home";
+    document.querySelectorAll(".nav-link, .nav-projects").forEach((link) => {
+        link.classList.remove("is-active");
+    });
+    document.querySelector('.nav-link[data-filter="Home"]').classList.add("is-active");
+    await loadProjects();
+    await loadTodos();
+}
+
+document.getElementById("delete-project").addEventListener("click", deleteCurrentProject);
+document.getElementById("delete-empty-project").addEventListener("click", deleteCurrentProject);
 
 form.addEventListener("submit", async function(event) {
     event.preventDefault();
@@ -166,13 +238,14 @@ form.addEventListener("submit", async function(event) {
     const details = document.getElementById("details").value;
     const priority = document.querySelector(".priority-choice.is-selected").dataset.priority;
     const due_date = document.getElementById("due_date").value || null;
+    const project_id = currentFilter === "Project" ? currentProjectId : null;
 
     const response = await fetch("http://127.0.0.1:5000/todos", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({ title, details, priority, due_date })
+        body: JSON.stringify({ title, details, priority, due_date, project_id })
     });
 
     if (!response.ok){
@@ -197,6 +270,31 @@ document.querySelectorAll(".priority-choice").forEach((button) => {
 const createModal = document.getElementById("create-modal");
 const closeModal = document.querySelector(".modal-close");
 
+// project form
+const projectForm = document.getElementById("project-form");
+
+projectForm.addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const name = document.getElementById("project-name").value;
+    const response = await fetch("http://127.0.0.1:5000/projects", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ name })
+    });
+
+    if (!response.ok){
+        const err = await response.json();
+        alert(err.error || "Failed to create project");
+        return;
+    }
+
+    projectForm.reset();
+    createModal.classList.add("is-hidden");
+    await loadProjects();
+});
 
 // toggle add form ( will change later )
 addButton.addEventListener("click", function() {
@@ -231,10 +329,10 @@ sortSelect.addEventListener("change", function () {
 });
 
 // filter buttons
-document.querySelectorAll(".nav-link[data-filter]").forEach((button) => {
+document.querySelectorAll(".nav-link[data-filter], .nav-projects[data-filter]").forEach((button) => {
     button.addEventListener("click", function () {
       currentFilter = button.dataset.filter;
-      document.querySelectorAll(".nav-link").forEach((link) => {
+      document.querySelectorAll(".nav-link, .nav-projects").forEach((link) => {
         link.classList.remove("is-active");
       });
       button.classList.add("is-active");

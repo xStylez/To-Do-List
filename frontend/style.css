@@ -87,7 +87,7 @@
   padding: 2rem 2rem;
   display: flex;
   flex-direction: column;
-  gap: 0.35rem; /* even space between ALL items */
+  gap: 0.25rem; /* even space between ALL items */
 }
 
 .nav-link {
@@ -146,6 +146,99 @@
   cursor: default;
 }
 
+#projects-label {
+  cursor: pointer;
+  border: none;
+  background: transparent;
+}
+
+#notes-link {
+  padding-top: 0.7rem;
+}
+
+.projects-list {
+  list-style: none;
+  margin: 0.6rem -2.1rem 0 0;
+  padding: 0 0.75rem 1rem 1rem;
+  max-height: 150px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.projects-list::-webkit-scrollbar {
+  width: 6px;
+}
+.projects-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.projects-list::-webkit-scrollbar-thumb {
+  background: #c38d9e;
+  border-radius: 999px;
+}
+
+.projects-list::-webkit-scrollbar-button:vertical:start:decrement,
+.projects-list::-webkit-scrollbar-button:vertical:end:increment {
+  display: block;
+  height: 0;
+  width: 0;
+  background: transparent;
+}
+
+.nav-projects {
+  width: 100%;
+  height: auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  border: none;
+  background: transparent;
+  padding: 0 1.1rem 0 1.4rem; /* same left edge for every link */
+  font-size: 1.1rem;
+  font-family: "Josefin Sans", system-ui, sans-serif;
+  font-weight: 300;
+  color: var(--accent-purple);
+  cursor: pointer;
+}
+
+.nav-projects:hover,
+.nav-projects.is-active {
+  font-weight: 500;
+  color: #4d324e;
+}
+
+/* // starts at that left edge, then pushes the word right */
+.nav-projects::before {
+  content: "//";
+  display: inline-block;
+  max-width: 0;
+  overflow: hidden;
+  opacity: 0;
+  white-space: nowrap;
+  font-size: 1.2rem;
+  letter-spacing: -0.12rem;
+  margin-right: 0;
+  padding-right: 0.1em;
+  transition: max-width 0.2s ease, opacity 0.15s ease, margin-right 0.2s ease;
+  flex-shrink: 0;
+}
+
+.nav-projects:hover::before,
+.nav-projects.is-active::before {
+  max-width: 2.5em;
+  opacity: 1;
+  margin-right: 0.35rem;
+}
+
+.nav-projects-name {
+  flex: 0 0 8rem;
+  width: 8rem;
+  overflow-wrap: anywhere;
+  text-align: left;
+}
+
 .add-button {
   width: 50px;
   height:50px;
@@ -160,9 +253,9 @@
   justify-content: center;
   cursor: pointer;
   box-shadow: 0 4px 8px rgba(1, 1, 1, 0.4);
-  position: relative;
-  left: 40px;
-  bottom: -130px;
+  position: absolute;
+  left: 280px;
+  bottom: 95px;
 }
 
 .is-hidden {
@@ -299,6 +392,35 @@
   background: #fff;
   border-radius: 6px;
   padding: 0.25rem 0.4rem;
+}
+
+.delete-project-button,
+.delete-empty-button {
+  height: 25px;
+  padding: 0.3rem 0.6rem;
+  background: transparent;
+  border: 1px solid var(--accent-purple);
+  border-radius: 4px;
+  color: var(--accent-purple);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+}
+
+.delete-project-button {
+  margin-right: auto;
+}
+
+.empty-project {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.empty-project h2,
+.empty-project p {
+  color: var(--accent-purple);
+  font-weight: 300;
 }
 
 
@@ -561,6 +683,7 @@
   background: transparent;
   color: var(--accent);
   border: 1px solid var(--accent);
+  border-radius: 4px;
   padding: 0.3rem 0.5rem 0.2rem 0.5rem;
   cursor: pointer;
   display: flex;
@@ -582,4 +705,108 @@
 
 .todo-form-title-input:focus {
   outline: none;
+}
+
+
+.project-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  flex: 1;
+}
+
+.project-form-name-input {
+  width: 60%;
+  background: transparent;
+  color: rgb(20,20,20);
+  font-family: "Josefin Sans", system-ui, sans-serif;
+  font-weight: 300;
+  font-size: 1.1rem;
+  border: none;
+}
+
+.project-form-name-input:focus {
+  outline: none;
+}
+
+.project-form-add-button {
+  height: 25px;
+  width: 20%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+  font-size: 0.65rem;
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  color: var(--accent);
+  margin-top: auto; /* push button to bottom of form */
+}
+
+/* notes form */
+
+.notes-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  flex: 1;
+}
+
+.notes-form-title-input {
+  width: 60%;
+  background: transparent;
+  color: rgb(20,20,20);
+  font-family: "Josefin Sans", system-ui, sans-serif;
+  font-weight: 300;
+  font-size: 1.1rem;
+  border: none;
+}
+
+.notes-form-title-input:focus {
+  outline: none;
+}
+
+.notes-form-details-input {
+  width: 100%;
+  height: 140px;
+  resize: none;
+  padding-top: 0.6rem;
+  background: transparent;
+  color: rgb(20,20,20);
+  font-family: "Josefin Sans", system-ui, sans-serif;
+  font-weight: 300;
+  font-size: 1.1rem;
+  border: none;
+  text-align: start;
+}
+
+.notes-form-details-input:focus {
+  outline: none;
+}
+
+.notes-form-add-button {
+  height: 25px;
+  width: 18%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+  font-size: 0.65rem;
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  color: var(--accent);
+  margin-top: auto; /* push button to bottom of form */
+}
+
+.notes-form-add-button:hover,
+.project-form-add-button:hover,
+.todo-form-add-button:hover {
+  background-color: var(--accent);
+  color: #fff;
 }

@@ -114,12 +114,56 @@ def done_todo(todo_id):
     return jsonify({"message": "Todo marked as done"}), 200
 
 
+@app.route("/projects", methods=["GET"])
+def get_projects():
+    connection = get_connection()
+    cursor = connection.cursor()
+    projects = []
+    cursor.execute("SELECT id, name FROM projects")
+    rows = cursor.fetchall()
+    for row in rows:
+        projects.append({"id": row[0], "name": row[1]})
+    connection.close()
+    return jsonify({"projects": projects})
 
+@app.route("/projects", methods=["POST"])
+def create_project():
+    data = request.get_json() or {}
+    name = data.get("name")
 
+    if not name:
+        return jsonify({"error": "Name is required"}), 400
 
+    try:
+        connection = get_connection()
+        cursor = connection.cursor()
+        cursor.execute("INSERT INTO projects(name) VALUES(?)", (name,))
+        connection.commit()
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        connection.close()
 
+    return jsonify({"message": "Project created successfully"}), 201
 
+@app.route("/projects/<int:project_id>", methods=["DELETE"])
+def delete_project(project_id):
+    try:
+        connection = get_connection()
+        connection.execute("PRAGMA foreign_keys = ON")
+        cursor = connection.cursor()
+        cursor.execute("DELETE FROM projects WHERE id=?", (project_id,))
 
+        if cursor.rowcount == 0:
+            return jsonify({"error": "Project not found"}), 404
+
+        connection.commit()
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        connection.close()
+
+    return jsonify({"message": "Project deleted successfully"}), 200
 
 if __name__ == "__main__":
     setup_database()
