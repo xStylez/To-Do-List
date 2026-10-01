@@ -35,19 +35,36 @@
 
           </aside>
 
+          <!-- Details Modal -->
+          <div class="modal-overlay is-hidden" id="details-modal">
+            <div class="modal">
+              <header class="modal-header">
+                <h2 class="modal-title">To-Do Details</h2>
+                <button type="button" class="modal-close" id="close-details-modal" aria-label="Close">×</button>
+              </header>
+              <div class="details-body">
+                <h3> <span id="details-title"></span></h3>
+                <p>Project: <span id="details-project"></span></p>
+                <p>Details: <span id="details-details"></span></p>
+                <p>Due Date: <span id="details-due-date"></span></p>
+                <p>Priority: <span id="details-priority"></span></p>
+              </div>
+            </div>
+          </div>
+
           <!-- Modal (Add To Do , Project, Notes) -->
            <div class="modal-overlay is-hidden" id="create-modal">
             <div class="modal">
               <header class="modal-header">
                 <h2 class="modal-title">Create a new...</h2>
-                <button type="button" class="modal-close" aria-label="Close">×</button>
+                <button type="button" class="modal-close" id="close-create-modal" aria-label="Close">×</button>
               </header>
               <div class="modal-body">
                 <aside class="modal-nav">
                   <button type="button" class="modal-tab is-active" data-panel="todo">To Do</button>
                   <button type="button" class="modal-tab" data-panel="project">Project</button>
                   <button type="button" class="modal-tab" data-panel="note">Note</button>
-                </aside>
+                </aside>            
 
                 <div class="modal-panels">
                   <section class="modal-panel" data-panel="todo">

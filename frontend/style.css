@@ -500,6 +500,14 @@
   cursor: pointer;
 }
 
+.modal-tab.is-blocked,
+.modal-tab.is-blocked:hover {
+  text-decoration: line-through;
+  color: #888;
+  font-weight: 300;
+  cursor: default;
+}
+
 .modal-panels {
   display: flex;
   flex-direction: column;

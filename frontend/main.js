@@ -1,8 +1,11 @@
 let currentFilter = "Home";
 let currentSort = "date";
+let projects = [];
 let currentProjectId = null;
 const form = document.getElementById("todo-form");
 const addButton = document.querySelector(".add-button");
+const detailsModal = document.getElementById("details-modal");
+const detailsButton = document.querySelector(".todo-details");
 
 // makes due date Month / Day only
 function formatDueDate(dateString) {
@@ -154,6 +157,21 @@ async function loadTodos(){
         detailsButton.className = "todo-details";
         detailsButton.textContent = "Details";
 
+        
+        detailsButton.addEventListener("click", function() {
+            document.getElementById("details-title").textContent = todo.title;
+            document.getElementById("details-details").textContent = todo.details;
+            const year = todo.due_date ? todo.due_date.split("-")[0] : "";
+            document.getElementById("details-due-date").textContent = todo.due_date ? `${formatDueDate(todo.due_date)} ${year}` : "N/A";
+            document.getElementById("details-priority").textContent = todo.priority;
+
+            const project = projects.find((item) => item.id === todo.project_id);
+            document.getElementById("details-project").textContent = project ? project.name : "N/A";
+
+            detailsModal.classList.remove("is-hidden");
+        });
+
+
         li.appendChild(checkbox);
         li.appendChild(title);
         li.appendChild(detailsButton);
@@ -167,6 +185,7 @@ async function loadTodos(){
 async function loadProjects(){
     const response = await fetch("http://127.0.0.1:5000/projects");
     const data = await response.json();
+    projects = data.projects;
 
     const list = document.querySelector(".projects-list");
     list.innerHTML = "";
@@ -268,7 +287,7 @@ document.querySelectorAll(".priority-choice").forEach((button) => {
   });
 
 const createModal = document.getElementById("create-modal");
-const closeModal = document.querySelector(".modal-close");
+const closeModal = document.querySelector("#create-modal .modal-close");
 
 // project form
 const projectForm = document.getElementById("project-form");
@@ -296,13 +315,33 @@ projectForm.addEventListener("submit", async function(event) {
     await loadProjects();
 });
 
+
+const closeDetailsModal = document.querySelector("#details-modal .modal-close");
+
 // toggle add form ( will change later )
 addButton.addEventListener("click", function() {
     createModal.classList.remove("is-hidden");
+
+    const todoTab = document.querySelector('.modal-tab[data-panel="todo"]');
+    const blocked = currentFilter !== "Project";
+    todoTab.classList.toggle("is-blocked", blocked);
+    todoTab.disabled = blocked;
+
+    if (blocked) {
+        document.querySelector('.modal-tab[data-panel="project"]').click();
+    }
+
+    if (currentFilter === "Project") {
+        return;
+    }
 });
 
 closeModal.addEventListener("click", function() {
     createModal.classList.add("is-hidden");
+});
+
+closeDetailsModal.addEventListener("click", function() {
+    detailsModal.classList.add("is-hidden");
 });
 
 document.querySelectorAll(".modal-tab").forEach((tab) => {
