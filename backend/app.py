@@ -165,6 +165,31 @@ def delete_project(project_id):
 
     return jsonify({"message": "Project deleted successfully"}), 200
 
+
+@app.route("/todos/<int:todo_id>/edit", methods=["PUT"])
+def update_todo(todo_id):
+    data = request.get_json() or {}
+    
+    title = data.get("title")
+    details = data.get("details")
+    due_date = data.get("due_date")
+    priority = data.get("priority")
+
+    if not title or priority not in ["low", "medium", "high"]:
+        return jsonify({"error": "Title and priority are required"}), 400
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor()
+        cursor.execute("UPDATE todos SET title=?, details=?, due_date=?, priority=? WHERE id=?", (title, details, due_date, priority, todo_id,))
+        connection.commit()
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        connection.close()
+    return jsonify({"message": "Todo updated successfully"}), 200
+    
+
 if __name__ == "__main__":
     setup_database()
     app.run(debug=True)

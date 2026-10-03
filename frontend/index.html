@@ -37,7 +37,7 @@
 
           <!-- Details Modal -->
           <div class="modal-overlay is-hidden" id="details-modal">
-            <div class="modal">
+            <div class="modal-details">
               <header class="modal-header">
                 <h2 class="modal-title">To-Do Details</h2>
                 <button type="button" class="modal-close" id="close-details-modal" aria-label="Close">×</button>
@@ -49,6 +49,48 @@
                 <p>Due Date: <span id="details-due-date"></span></p>
                 <p>Priority: <span id="details-priority"></span></p>
               </div>
+            </div>
+          </div>
+
+
+          <!-- Modal Edit to do -->
+          <div class="modal-overlay is-hidden" id="edit-modal">
+            <div class="modal">
+              <header class="modal-header">
+                <h2 class="modal-title">Edit To-Do</h2>
+                <button type="button" class="modal-close" id="close-edit-modal" aria-label="Close">×</button>
+              </header>
+              <div class="modal-body">
+                <div class="modal-panels">
+                  <section class="modal-panel" data-panel="todo">
+                    <!-- To Do Modal Panel -->
+                    <form id="edit-form" class="todo-form">
+                      <input id="edit-title" type="text" class="todo-form-title-input" " required>
+                      <textarea id="edit-details" type="text" class="todo-form-details-input" maxlength="350""></textarea>
+                      <div class="todo-form-row-date">
+                        <label for="due_date">Due Date:</label>
+                        <input id="edit-due_date" type="date" class="todo-form-due-date-input">
+                      </div>
+                      <div class="todo-form-row-priority">
+                        <span>Priority:</span>
+                            <button type="button" class="priority-choice is-selected priority-choice-low" data-priority="low">Low</button>
+                            <button type="button" class="priority-choice priority-choice-medium" data-priority="medium">Medium</button>
+                            <button type="button" class="priority-choice priority-choice-high" data-priority="high">High</button>
+                            <button type="submit" class="todo-form-add-button">Update</button>
+                      </div>
+                    </form>
+                  </section>
+                </div>
+              </div>
+            </div>
+           </div>
+
+          <!-- Success Modal -->
+           <div class="success-overlay is-hidden" id="success-modal">
+            <div class="success-card">
+              <div class="success-check">✓</div>
+              <h2>Success!</h2>
+              <p id="success-message">Todo updated.</p>
             </div>
           </div>
 

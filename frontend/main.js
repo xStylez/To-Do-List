@@ -2,9 +2,11 @@ let currentFilter = "Home";
 let currentSort = "date";
 let projects = [];
 let currentProjectId = null;
+let editingTodoId = null;
 const form = document.getElementById("todo-form");
 const addButton = document.querySelector(".add-button");
 const detailsModal = document.getElementById("details-modal");
+const editModal = document.getElementById("edit-modal");
 const detailsButton = document.querySelector(".todo-details");
 
 // makes due date Month / Day only
@@ -151,6 +153,24 @@ async function loadTodos(){
             </svg>
         `;
 
+        editButton.addEventListener("click", function() {
+
+            document.getElementById("edit-title").value = todo.title;
+            document.getElementById("edit-details").value = todo.details;
+            document.getElementById("edit-due_date").value = todo.due_date;
+
+            document.querySelectorAll("#edit-modal .priority-choice").forEach((button) => {
+                button.classList.toggle("is-selected", button.dataset.priority === todo.priority);
+            });
+
+            editingTodoId = todo.id;
+            editModal.classList.remove("is-hidden");
+        });
+
+        document.getElementById("close-edit-modal").addEventListener("click", function() {
+            editModal.classList.add("is-hidden");
+        });
+
         //details button
         const detailsButton = document.createElement("button");
         detailsButton.type = "button";
@@ -276,6 +296,38 @@ form.addEventListener("submit", async function(event) {
     form.reset();
     await loadTodos();
 }); 
+
+document.getElementById("edit-form").addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const title = document.getElementById("edit-title").value;
+    const details = document.getElementById("edit-details").value;
+    const due_date = document.getElementById("edit-due_date").value || null;
+    const priority = document.querySelector("#edit-modal .priority-choice.is-selected").dataset.priority;
+
+    const response = await fetch(`http://127.0.0.1:5000/todos/${editingTodoId}/edit`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ title, details, due_date, priority })
+    });
+
+    if (!response.ok){
+        const err = await response.json();
+        alert(err.error || "Failed to update todo");
+        return;
+    }
+
+    editModal.classList.add("is-hidden");
+    await loadTodos();
+    document.getElementById("success-message").textContent = "Todo updated.";
+    const successModal = document.getElementById("success-modal");
+    successModal.classList.remove("is-hidden");
+    setTimeout(function () {
+        successModal.classList.add("is-hidden");
+    }, 2000);
+});
 
 document.querySelectorAll(".priority-choice").forEach((button) => {
     button.addEventListener("click", function () {

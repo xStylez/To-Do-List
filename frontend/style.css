@@ -76,6 +76,7 @@
 }
 
 .sidebar {
+  position: relative;
   width: 260px;
   background: var(--sidebar-bg);
   border-right: 1.5px solid #afb1b1;
@@ -254,8 +255,10 @@
   cursor: pointer;
   box-shadow: 0 4px 8px rgba(1, 1, 1, 0.4);
   position: absolute;
-  left: 280px;
-  bottom: 95px;
+  left: 2rem;
+  bottom: 1.5rem;
+  margin: 0;
+
 }
 
 .is-hidden {
@@ -442,8 +445,8 @@
 }
 
 .modal {
-  width: min(760px, 92vw);
-  height: min(380px, 80vh);
+  width: min(760px, 72vw);
+  height: min(380px, 60vh);
   background: var(--app-bg);
   box-shadow: 0 2rem 4rem rgba(0, 0, 0, 0.6);
   border-radius: 4px;
@@ -451,6 +454,22 @@
   position: relative;
   display: flex;
   flex-direction: column;
+}
+
+.modal-details {
+  width: 560px;
+  height: 235px;
+  background: var(--app-bg);
+  box-shadow: 0 2rem 4rem rgba(0, 0, 0, 0.6);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.details-body {
+  margin-left: 2rem;
 }
 
 .modal-header {
@@ -817,4 +836,63 @@
 .todo-form-add-button:hover {
   background-color: var(--accent);
   color: #fff;
+}
+
+/* success modal */
+.success-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+}
+
+.success-overlay.is-hidden {
+  display: none;
+}
+
+.success-card {
+  width: min(320px, 90vw);
+  padding: 2rem 1.5rem 1.5rem;
+  border-radius: 16px;
+  background: var(--app-bg);
+  color: var(--accent-purple);
+  text-align: center;
+}
+
+.success-check {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1rem;
+  border-radius: 50%;
+  background: #27ac5e;
+  color: white;
+  font-size: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.success-check::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 3px solid #27ac5e;
+  animation: successPulse 1.5s infinite;
+}
+
+@keyframes successPulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
 }
