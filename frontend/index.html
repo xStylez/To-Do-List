@@ -28,7 +28,7 @@
                 <li>
                   <ul class="projects-list"></ul>
                 </li>
-                <li><button type="button" class="nav-link" id="notes-link">Notes</button></li>
+                <li><button type="button" class="nav-link" id="notes-link" data-filter="Notes">Notes</button></li>
               </ul>
               <button type="button" class="add-button">+</button>
             </nav>
@@ -62,11 +62,11 @@
               </header>
               <div class="modal-body">
                 <div class="modal-panels">
-                  <section class="modal-panel" data-panel="todo">
-                    <!-- To Do Modal Panel -->
+                  <section>
+                    <!-- To Do Modal Panel ( for editing )-->
                     <form id="edit-form" class="todo-form">
-                      <input id="edit-title" type="text" class="todo-form-title-input" " required>
-                      <textarea id="edit-details" type="text" class="todo-form-details-input" maxlength="350""></textarea>
+                      <input id="edit-title" type="text" class="todo-form-title-input" required>
+                      <textarea id="edit-details" type="text" class="todo-form-details-input" maxlength="350"></textarea>
                       <div class="todo-form-row-date">
                         <label for="due_date">Due Date:</label>
                         <input id="edit-due_date" type="date" class="todo-form-due-date-input">
@@ -90,7 +90,7 @@
             <div class="success-card">
               <div class="success-check">✓</div>
               <h2>Success!</h2>
-              <p id="success-message">Todo updated.</p>
+              <p id="success-message"></p>
             </div>
           </div>
 
@@ -110,7 +110,7 @@
 
                 <div class="modal-panels">
                   <section class="modal-panel" data-panel="todo">
-                    <!-- To Do Modal Panel -->
+                    <!-- To Do Modal Panel ( for creating )-->
                     <form id="todo-form" class="todo-form">
                       <input id="title" type="text" class="todo-form-title-input" placeholder="Title: 'Shopping'" required>
                       <textarea id="details" type="text" class="todo-form-details-input" maxlength="350" placeholder="Details. eg. water bill, electricity bill, etc."></textarea>
@@ -150,22 +150,25 @@
 
           <main class="todo-panel">
 
-            <div class="list-sort">
-              <button type="button" class="delete-project-button is-hidden" id="delete-project">Delete Project</button>
-              <label class="sort-label"for="sort-select">Sort by:</label>
-              <select id="sort-select">
-                <option value="date">Date</option>
-                <option value="priority">Priority</option>
-                <option value="newest">Newest</option>
-              </select>
+            <div id="todo-view">
+              <div class="list-sort">
+                <button type="button" class="delete-project-button is-hidden" id="delete-project">Delete Project</button>
+                <label class="sort-label"for="sort-select">Sort by:</label>
+                <select id="sort-select">
+                  <option value="date">Date</option>
+                  <option value="priority">Priority</option>
+                  <option value="newest">Newest</option>
+                </select>
+              </div>
+              <div id="empty-project" class="empty-project is-hidden">
+                <h2>Empty Project!</h2>
+                <p>Create a to-do to get started.</p>
+                <button type="button" id="delete-empty-project" class="delete-empty-button">Delete Project</button>
+              </div>
+              <ul id="todo-list"></ul>
             </div>
+            <div id="notes-board" class="is-hidden"></div>
 
-            <div id="empty-project" class="empty-project is-hidden">
-              <h2>Empty Project!</h2>
-              <p>Create a to-do to get started.</p>
-              <button type="button" id="delete-empty-project" class="delete-empty-button">Delete Project</button>
-            </div>
-            <ul id="todo-list"></ul>
           </main>
 
         </div>

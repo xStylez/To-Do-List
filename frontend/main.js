@@ -9,6 +9,15 @@ const detailsModal = document.getElementById("details-modal");
 const editModal = document.getElementById("edit-modal");
 const detailsButton = document.querySelector(".todo-details");
 
+function showSuccess(message) {
+    document.getElementById("success-message").textContent = message;
+    const successModal = document.getElementById("success-modal");
+    successModal.classList.remove("is-hidden");
+    setTimeout(function () {
+        successModal.classList.add("is-hidden");
+    }, 2000);
+}
+
 // makes due date Month / Day only
 function formatDueDate(dateString) {
   if (!dateString) return "";
@@ -27,6 +36,7 @@ function formatDueDate(dateString) {
 }
 
 async function loadTodos(){
+
     const response = await fetch("http://127.0.0.1:5000/todos");
     const data = await response.json();
 
@@ -34,6 +44,15 @@ async function loadTodos(){
     const today = new Date().toISOString().slice(0, 10); //YYYY-MM-DD
 
     let todos = data.todos;
+
+    const isNotes = currentFilter === "Notes";
+    document.getElementById("todo-view").classList.toggle("is-hidden", isNotes);
+    document.getElementById("notes-board").classList.toggle("is-hidden", !isNotes);
+
+    if (isNotes){
+        await loadNotes();
+        return;
+    }
 
     if (currentFilter === "Today"){
         todos = todos.filter((todo) => todo.due_date === today);
@@ -202,6 +221,76 @@ async function loadTodos(){
     }
 }
 
+async function loadNotes(){
+    const response = await fetch("http://127.0.0.1:5000/notes");
+    const data = await response.json();
+    const board = document.getElementById("notes-board");
+    board.innerHTML = "";
+
+    for (const note of data.notes){
+        const card = document.createElement("article");
+        card.className = "note-card";
+
+        const title = document.createElement("h3");
+        title.textContent = note.title;
+        title.contentEditable = true;
+
+        const details = document.createElement("p");
+        details.textContent = note.details || "";
+        details.contentEditable = true;
+
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.className = "note-delete";
+        remove.textContent = "X";
+        remove.addEventListener("click", async function () {
+            const response = await fetch(`http://127.0.0.1:5000/notes/${note.id}`, {
+                method: "DELETE"
+            });
+            if (!response.ok){
+                const err = await response.json();
+                alert(err.error || "Failed to delete note");
+                return;
+            }
+
+            await loadNotes();
+            showSuccess("Note deleted.");
+        });
+
+        card.addEventListener("focusout", async function (event) {
+            if (card.contains(event.relatedTarget)) {
+              return;
+            }
+          
+            const newTitle = title.textContent.trim();
+            if (!newTitle) {
+              alert("Title is required");
+              await loadNotes();
+              return;
+            }
+          
+            const response = await fetch(`http://127.0.0.1:5000/notes/${note.id}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                title: newTitle,
+                details: details.textContent.trim()
+              })
+            });
+          
+            if (!response.ok) {
+              const err = await response.json();
+              alert(err.error || "Failed to update note");
+            }
+          });
+
+        card.appendChild(title);
+        card.appendChild(details);
+        board.appendChild(card);
+        card.appendChild(remove);
+    }
+}
+
 async function loadProjects(){
     const response = await fetch("http://127.0.0.1:5000/projects");
     const data = await response.json();
@@ -295,6 +384,7 @@ form.addEventListener("submit", async function(event) {
 
     form.reset();
     await loadTodos();
+    showSuccess("Todo created.");
 }); 
 
 document.getElementById("edit-form").addEventListener("submit", async function(event) {
@@ -321,12 +411,7 @@ document.getElementById("edit-form").addEventListener("submit", async function(e
 
     editModal.classList.add("is-hidden");
     await loadTodos();
-    document.getElementById("success-message").textContent = "Todo updated.";
-    const successModal = document.getElementById("success-modal");
-    successModal.classList.remove("is-hidden");
-    setTimeout(function () {
-        successModal.classList.add("is-hidden");
-    }, 2000);
+    showSuccess("Todo updated.");
 });
 
 document.querySelectorAll(".priority-choice").forEach((button) => {
@@ -365,8 +450,36 @@ projectForm.addEventListener("submit", async function(event) {
     projectForm.reset();
     createModal.classList.add("is-hidden");
     await loadProjects();
+    showSuccess("Project created.");
 });
 
+// notes form
+
+document.getElementById("notes-form").addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const title = document.getElementById("notes-title").value;
+    const details = document.getElementById("notes-details").value;
+
+    const response = await fetch("http://127.0.0.1:5000/notes", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ title, details })
+    });
+
+    if (!response.ok){
+        const err = await response.json();
+        alert(err.error || "Failed to create note");
+        return;
+    }
+
+    document.getElementById("notes-form").reset();
+    createModal.classList.add("is-hidden");
+    await loadNotes();
+    showSuccess("Note created.");
+});
 
 const closeDetailsModal = document.querySelector("#details-modal .modal-close");
 
@@ -383,7 +496,18 @@ addButton.addEventListener("click", function() {
         document.querySelector('.modal-tab[data-panel="project"]').click();
     }
 
+    if (currentFilter === "Notes") {
+        document.querySelector('.modal-tab[data-panel="note"]').click();
+        return;
+    }
+
+    if (currentFilter === "Home" || currentFilter === "Today" || currentFilter === "Week") {
+        document.querySelector('.modal-tab[data-panel="project"]').click();
+        return;
+    }
+
     if (currentFilter === "Project") {
+        document.querySelector('.modal-tab[data-panel="todo"]').click();
         return;
     }
 });

@@ -188,6 +188,56 @@ def update_todo(todo_id):
     finally:
         connection.close()
     return jsonify({"message": "Todo updated successfully"}), 200
+
+
+@app.route("/notes", methods=["GET"])
+def get_notes():
+    connection = get_connection()
+    cursor = connection.cursor()
+    cursor.execute("SELECT id, title, details FROM notes")
+    rows = cursor.fetchall()
+    connection.close()
+    notes = [{"id": row[0], "title": row[1], "details": row[2]} for row in rows]
+    return jsonify({"notes": notes})
+
+@app.route("/notes", methods=["POST"])
+def create_note():
+    data = request.get_json() or {}
+    title = data.get("title")
+    details = data.get("details")
+
+    if not title:
+        return jsonify({"error": "Title is required"}), 400
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor()
+        cursor.execute("INSERT INTO notes(title, details) VALUES(?, ?)", (title, details))
+        connection.commit()
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        connection.close()
+    return jsonify({"message": "Note created successfully"}), 201
+    
+
+@app.route("/notes/<int:note_id>", methods=["DELETE"])
+def delete_note(note_id):
+    try:
+        connection = get_connection()
+        cursor = connection.cursor()
+        cursor.execute("DELETE FROM notes WHERE id = ?", (note_id,))
+
+        if cursor.rowcount == 0:
+            return jsonify({"error": "Note not found"}), 404
+
+        connection.commit()
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        connection.close()
+
+    return jsonify({"message": "Note deleted"}), 200
     
 
 if __name__ == "__main__":
