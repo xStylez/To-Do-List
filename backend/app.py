@@ -345,7 +345,7 @@ def login():
 
     session.permanent = True
     session["user_id"] = user[0]
-    
+
     return jsonify({"message": "Logged in successfully"}), 200
     
 @app.route("/logout", methods=["POST"])
@@ -359,6 +359,9 @@ def me():
         return jsonify({"error": "Unauthorized"}), 401
     return jsonify({"message": "User is logged in"}), 200
 
+
+setup_database()
+
 if __name__ == "__main__":
-    setup_database()
     app.run(debug=True)
+

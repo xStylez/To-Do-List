@@ -37,7 +37,7 @@ function formatDueDate(dateString) {
 
 async function loadTodos(){
 
-    const response = await fetch("http://127.0.0.1:5000/todos");
+    const response = await fetch("/todos");
     const data = await response.json();
 
     // filter todos for todau & week
@@ -126,7 +126,7 @@ async function loadTodos(){
             </svg>
         `;
         deleteButton.addEventListener("click", async function () {
-            const response = await fetch(`http://127.0.0.1:5000/todos/${todo.id}`, {
+            const response = await fetch(`/todos/${todo.id}`, {
                 method: "DELETE"
             });
 
@@ -144,7 +144,7 @@ async function loadTodos(){
         checkbox.type = "checkbox";
         checkbox.checked = todo.done === 1;
         checkbox.addEventListener("change", async function () {
-            const response = await fetch(`http://127.0.0.1:5000/todos/${todo.id}`, {
+            const response = await fetch(`/todos/${todo.id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -222,7 +222,7 @@ async function loadTodos(){
 }
 
 async function loadNotes(){
-    const response = await fetch("http://127.0.0.1:5000/notes");
+    const response = await fetch("/notes");
     const data = await response.json();
     const board = document.getElementById("notes-board");
     board.innerHTML = "";
@@ -244,7 +244,7 @@ async function loadNotes(){
         remove.className = "note-delete";
         remove.textContent = "X";
         remove.addEventListener("click", async function () {
-            const response = await fetch(`http://127.0.0.1:5000/notes/${note.id}`, {
+            const response = await fetch(`/notes/${note.id}`, {
                 method: "DELETE"
             });
             if (!response.ok){
@@ -269,7 +269,7 @@ async function loadNotes(){
               return;
             }
           
-            const response = await fetch(`http://127.0.0.1:5000/notes/${note.id}`, {
+            const response = await fetch(`/notes/${note.id}`, {
               method: "PUT",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
@@ -292,7 +292,7 @@ async function loadNotes(){
 }
 
 async function loadProjects(){
-    const response = await fetch("http://127.0.0.1:5000/projects");
+    const response = await fetch("/projects");
     const data = await response.json();
     projects = data.projects;
 
@@ -333,7 +333,7 @@ projectsToggle.addEventListener("click", function () {
 });
 
 async function deleteCurrentProject() {
-    const response = await fetch(`http://127.0.0.1:5000/projects/${currentProjectId}`, {
+    const response = await fetch(`/projects/${currentProjectId}`, {
         method: "DELETE"
     });
 
@@ -365,7 +365,7 @@ form.addEventListener("submit", async function(event) {
     const due_date = document.getElementById("due_date").value || null;
     const project_id = currentFilter === "Project" ? currentProjectId : null;
 
-    const response = await fetch("http://127.0.0.1:5000/todos", {
+    const response = await fetch("/todos", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -392,7 +392,7 @@ document.getElementById("edit-form").addEventListener("submit", async function(e
     const due_date = document.getElementById("edit-due_date").value || null;
     const priority = document.querySelector("#edit-modal .priority-choice.is-selected").dataset.priority;
 
-    const response = await fetch(`http://127.0.0.1:5000/todos/${editingTodoId}/edit`, {
+    const response = await fetch(`/todos/${editingTodoId}/edit`, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json"
@@ -430,7 +430,7 @@ projectForm.addEventListener("submit", async function(event) {
     event.preventDefault();
 
     const name = document.getElementById("project-name").value;
-    const response = await fetch("http://127.0.0.1:5000/projects", {
+    const response = await fetch("/projects", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -458,7 +458,7 @@ document.getElementById("notes-form").addEventListener("submit", async function(
     const title = document.getElementById("notes-title").value;
     const details = document.getElementById("notes-details").value;
 
-    const response = await fetch("http://127.0.0.1:5000/notes", {
+    const response = await fetch("/notes", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -550,7 +550,7 @@ document.getElementById("show-login").addEventListener("click", function() {
 
 // logout button
 document.getElementById("logout-button").addEventListener("click", async function () {
-  await fetch("http://127.0.0.1:5000/logout", { method: "POST" });
+  await fetch("/logout", { method: "POST" });
   document.getElementById("app-page").classList.add("is-hidden");
   document.getElementById("auth-screen").classList.remove("is-hidden");
 });
@@ -560,7 +560,7 @@ document.getElementById("register-form").addEventListener("submit", async functi
     const username = document.getElementById("register-username").value;
     const password = document.getElementById("register-password").value;
     event.target.reset();
-    const response = await fetch("http://127.0.0.1:5000/register", {
+    const response = await fetch("/register", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -582,7 +582,7 @@ document.getElementById("login-form").addEventListener("submit", async function(
     const username = document.getElementById("login-username").value;
     const password = document.getElementById("login-password").value;
     event.target.reset();
-    const response = await fetch("http://127.0.0.1:5000/login", {
+    const response = await fetch("/login", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -606,7 +606,7 @@ document.getElementById("login-form").addEventListener("submit", async function(
 
 // keeps the session alive until timeout ( 30 minutes ) - refresh does not bring you back at auth screen
 async function restoreSession(){
-    const me = await fetch("http://127.0.0.1:5000/me");
+    const me = await fetch("/me");
     if (!me.ok){
         document.getElementById("auth-screen").classList.remove("is-hidden");
         return;
