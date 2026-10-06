@@ -1,8 +1,12 @@
-from flask import Flask, jsonify, request, send_from_directory
+from flask import Flask, jsonify, request, send_from_directory, session
 from db import setup_database, get_connection
+from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import timedelta
 import os
 
 app = Flask(__name__)
+app.secret_key = "dev-secret"
+app.permanent_session_lifetime = timedelta(minutes=30)
 app.json.sort_keys = False
 
 FRONTEND_DIR = os.path.join(os.path.dirname(__file__), "..", "frontend")
@@ -26,8 +30,13 @@ def get_todos():
     connection = get_connection()
     cursor = connection.cursor()
 
+    user_id = session.get("user_id")
+
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
     todos = []
-    cursor.execute("SELECT * FROM todos")
+    cursor.execute("SELECT * FROM todos WHERE user_id = ?", (user_id,))
     rows = cursor.fetchall()
     for row in rows:
         todos.append({
@@ -37,7 +46,7 @@ def get_todos():
             "due_date": row[3],
             "priority": row[4],
             "done": row[5],
-            "project_id": row[6]
+            "project_id": row[6],
         })
 
     connection.close()
@@ -46,6 +55,11 @@ def get_todos():
 
 @app.route("/todos", methods=["POST"])
 def create_todo():
+
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
     data = request.get_json() or {}
     title = data.get("title")
     details = data.get("details")
@@ -62,7 +76,7 @@ def create_todo():
     try:
         connection = get_connection()
         cursor = connection.cursor()
-        cursor.execute("INSERT INTO todos(title, details, due_date, priority, project_id) VALUES(?, ?, ?, ?, ?)", (title, details, due_date, priority, project_id))
+        cursor.execute("INSERT INTO todos(title, details, due_date, priority, project_id, user_id) VALUES(?, ?, ?, ?, ?, ?)", (title, details, due_date, priority, project_id, user_id))
         connection.commit()
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -77,7 +91,12 @@ def delete_todo(todo_id):
     try:
         connection = get_connection()
         cursor = connection.cursor()
-        cursor.execute("DELETE FROM todos WHERE id=?", (todo_id,))
+
+        user_id = session.get("user_id")
+        if not user_id:
+            return jsonify({"error": "Unauthorized"}), 401
+
+        cursor.execute("DELETE FROM todos WHERE id=? AND user_id=?", (todo_id, user_id))
 
         if cursor.rowcount == 0:
             return jsonify({"error": "Todo not found"}), 404
@@ -96,6 +115,10 @@ def done_todo(todo_id):
     data = request.get_json() or {}
     done = data.get("done")
 
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
     if done not in (0, 1, True, False):
         return jsonify({"error": "Done must be 0, 1, True, or False"}), 400
 
@@ -104,7 +127,7 @@ def done_todo(todo_id):
     try:
         connection = get_connection()
         cursor = connection.cursor()
-        cursor.execute("UPDATE todos SET done=? WHERE id=?", (done, todo_id,))
+        cursor.execute("UPDATE todos SET done=? WHERE id=? AND user_id=?", (done, todo_id, user_id))
         connection.commit()
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -118,8 +141,13 @@ def done_todo(todo_id):
 def get_projects():
     connection = get_connection()
     cursor = connection.cursor()
+    user_id = session.get("user_id")
+
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
     projects = []
-    cursor.execute("SELECT id, name FROM projects")
+    cursor.execute("SELECT id, name FROM projects WHERE user_id = ?", (user_id,))
     rows = cursor.fetchall()
     for row in rows:
         projects.append({"id": row[0], "name": row[1]})
@@ -130,6 +158,10 @@ def get_projects():
 def create_project():
     data = request.get_json() or {}
     name = data.get("name")
+    user_id = session.get("user_id")
+
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
 
     if not name:
         return jsonify({"error": "Name is required"}), 400
@@ -137,7 +169,7 @@ def create_project():
     try:
         connection = get_connection()
         cursor = connection.cursor()
-        cursor.execute("INSERT INTO projects(name) VALUES(?)", (name,))
+        cursor.execute("INSERT INTO projects(name, user_id) VALUES(?, ?)", (name, user_id))
         connection.commit()
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -152,7 +184,12 @@ def delete_project(project_id):
         connection = get_connection()
         connection.execute("PRAGMA foreign_keys = ON")
         cursor = connection.cursor()
-        cursor.execute("DELETE FROM projects WHERE id=?", (project_id,))
+        user_id = session.get("user_id")
+
+        if not user_id:
+            return jsonify({"error": "Unauthorized"}), 401
+
+        cursor.execute("DELETE FROM projects WHERE id=? AND user_id=?", (project_id, user_id))
 
         if cursor.rowcount == 0:
             return jsonify({"error": "Project not found"}), 404
@@ -169,7 +206,11 @@ def delete_project(project_id):
 @app.route("/todos/<int:todo_id>/edit", methods=["PUT"])
 def update_todo(todo_id):
     data = request.get_json() or {}
-    
+    user_id = session.get("user_id")
+
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
     title = data.get("title")
     details = data.get("details")
     due_date = data.get("due_date")
@@ -181,7 +222,7 @@ def update_todo(todo_id):
     try:
         connection = get_connection()
         cursor = connection.cursor()
-        cursor.execute("UPDATE todos SET title=?, details=?, due_date=?, priority=? WHERE id=?", (title, details, due_date, priority, todo_id,))
+        cursor.execute("UPDATE todos SET title=?, details=?, due_date=?, priority=? WHERE id=? AND user_id=?", (title, details, due_date, priority, todo_id, user_id))
         connection.commit()
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -194,7 +235,12 @@ def update_todo(todo_id):
 def get_notes():
     connection = get_connection()
     cursor = connection.cursor()
-    cursor.execute("SELECT id, title, details FROM notes")
+    user_id = session.get("user_id")
+
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    cursor.execute("SELECT id, title, details FROM notes WHERE user_id = ?", (user_id,))
     rows = cursor.fetchall()
     connection.close()
     notes = [{"id": row[0], "title": row[1], "details": row[2]} for row in rows]
@@ -205,14 +251,18 @@ def create_note():
     data = request.get_json() or {}
     title = data.get("title")
     details = data.get("details")
+    user_id = session.get("user_id")
 
     if not title:
         return jsonify({"error": "Title is required"}), 400
+    
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
 
     try:
         connection = get_connection()
         cursor = connection.cursor()
-        cursor.execute("INSERT INTO notes(title, details) VALUES(?, ?)", (title, details))
+        cursor.execute("INSERT INTO notes(title, details, user_id) VALUES(?, ?, ?)", (title, details, user_id))
         connection.commit()
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -226,7 +276,12 @@ def delete_note(note_id):
     try:
         connection = get_connection()
         cursor = connection.cursor()
-        cursor.execute("DELETE FROM notes WHERE id = ?", (note_id,))
+        user_id = session.get("user_id")
+
+        if not user_id:
+            return jsonify({"error": "Unauthorized"}), 401
+
+        cursor.execute("DELETE FROM notes WHERE id = ? AND user_id = ?", (note_id, user_id))
 
         if cursor.rowcount == 0:
             return jsonify({"error": "Note not found"}), 404
@@ -238,7 +293,71 @@ def delete_note(note_id):
         connection.close()
 
     return jsonify({"message": "Note deleted"}), 200
+
+
+@app.route("/register", methods=["POST"])
+def register():
     
+    data = request.get_json() or {}
+    username = data.get("username")
+    password = data.get("password")
+
+    if not username or not password:
+        return jsonify({"error": "Username and password are required"}), 400
+    
+    password_hash = generate_password_hash(password)
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor()
+        cursor.execute("INSERT INTO users(username, password_hash) VALUES(?, ?)", (username, password_hash))
+        connection.commit()
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        connection.close()
+
+    return jsonify({"message": "User registered successfully"}), 201
+    
+
+@app.route("/login", methods=["POST"])
+def login():
+    
+    data = request.get_json() or {}
+    username = data.get("username")
+    password = data.get("password")
+
+    if not username or not password:
+        return jsonify({"error": "Username and password are required"}), 400
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor()
+        cursor.execute("SELECT id, password_hash FROM users where username = ?", (username,))
+        user = cursor.fetchone()
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        connection.close()
+
+    if not user or not check_password_hash(user[1], password):
+        return jsonify({"error": "Invalid username or password"}), 401
+
+    session.permanent = True
+    session["user_id"] = user[0]
+    
+    return jsonify({"message": "Logged in successfully"}), 200
+    
+@app.route("/logout", methods=["POST"])
+def logout():
+    session.clear()
+    return jsonify({"message": "Logged out successfully"}), 200
+
+@app.route("/me")
+def me():
+    if not session.get("user_id"):
+        return jsonify({"error": "Unauthorized"}), 401
+    return jsonify({"message": "User is logged in"}), 200
 
 if __name__ == "__main__":
     setup_database()

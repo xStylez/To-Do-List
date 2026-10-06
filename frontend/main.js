@@ -325,9 +325,6 @@ async function loadProjects(){
     }
 }
 
-loadTodos(); 
-loadProjects();
-
 const projectsToggle = document.getElementById("projects-label");
 const projectsList = document.querySelector(".projects-list");
 
@@ -534,6 +531,90 @@ document.querySelectorAll(".modal-tab").forEach((tab) => {
       });
     });
   });
+
+
+
+// authentication screen
+
+document.getElementById("show-register").addEventListener("click", function() {
+    document.getElementById("login-form").reset();
+    document.getElementById("login-form").classList.add("is-hidden");
+    document.getElementById("register-form").classList.remove("is-hidden");
+});
+
+document.getElementById("show-login").addEventListener("click", function() {
+    document.getElementById("register-form").reset();
+    document.getElementById("register-form").classList.add("is-hidden");
+    document.getElementById("login-form").classList.remove("is-hidden");
+});
+
+// logout button
+document.getElementById("logout-button").addEventListener("click", async function () {
+  await fetch("http://127.0.0.1:5000/logout", { method: "POST" });
+  document.getElementById("app-page").classList.add("is-hidden");
+  document.getElementById("auth-screen").classList.remove("is-hidden");
+});
+
+document.getElementById("register-form").addEventListener("submit", async function(event) {
+    event.preventDefault();
+    const username = document.getElementById("register-username").value;
+    const password = document.getElementById("register-password").value;
+    event.target.reset();
+    const response = await fetch("http://127.0.0.1:5000/register", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ username, password })
+    });
+    if (!response.ok){
+        const err = await response.json();
+        alert(err.error || "Failed to register");
+        return;
+    }
+
+    document.getElementById("show-login").click();
+});
+
+// login form
+document.getElementById("login-form").addEventListener("submit", async function(event) {
+    event.preventDefault();
+    const username = document.getElementById("login-username").value;
+    const password = document.getElementById("login-password").value;
+    event.target.reset();
+    const response = await fetch("http://127.0.0.1:5000/login", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ username, password })
+    });
+    if (!response.ok){
+        const err = await response.json();
+        alert(err.error || "Failed to login");
+        return;
+    }
+    
+    document.getElementById("auth-screen").classList.add("is-hidden");
+    document.getElementById("app-page").classList.remove("is-hidden");
+    await loadTodos();
+    await loadProjects();
+});
+
+async function restoreSession(){
+    const me = await fetch("http://127.0.0.1:5000/me");
+    if (!me.ok){
+        document.getElementById("auth-screen").classList.remove("is-hidden");
+        return;
+    }
+    
+    document.getElementById("auth-screen").classList.add("is-hidden");
+    document.getElementById("app-page").classList.remove("is-hidden");
+    await loadTodos();
+    await loadProjects();
+} 
+
+restoreSession();
 
 
 // sort select

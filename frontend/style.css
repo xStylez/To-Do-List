@@ -18,6 +18,17 @@
     overflow-x: hidden; /* safety for horizontal bar */
   }
 
+
+/* authentication screen */
+#auth-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  background: var(--app-bg);
+}
+
+
+/* app page */
 .page {
     min-height: 100vh;
     width: 100%;
@@ -61,6 +72,18 @@
     border-bottom: 1px solid #d2d8da;  
     border-radius: 10px 10px 0 0;
   }
+
+#logout-button {
+  margin-left: auto;
+  margin-right: 1rem;
+  border: none;
+  background: transparent;
+  color: white;
+  cursor: pointer;
+  font-size: 1.4rem;
+  font-family: "Josefin Sans", system-ui, sans-serif;
+  font-weight: 300;
+}
 
 .todo-logo {
     width: 250px;
