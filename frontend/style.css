@@ -24,9 +24,145 @@
   position: fixed;
   inset: 0;
   z-index: 30;
-  background: var(--app-bg);
+  background-image: url("/app/images/bg.jpg");
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-family: "Josefin Sans", system-ui, sans-serif;
 }
 
+#auth-screen.is-hidden {
+  display: none;
+}
+
+#auth-screen-warning {
+  position: absolute;
+  top: 11%;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0 1rem;
+  background: none;
+  border: none;
+  text-align: center;
+  align-items: center;
+}
+
+#auth-screen-warning p {
+  margin: 0.3rem;
+}
+
+
+
+#auth-screen form {
+  width: min(380px, 92vw);
+  background: var(--app-bg);
+  border: 1.5px solid #c7c9ca;
+  border-radius: 10px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+  padding: 2rem 1.75rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+#login-form {
+  animation: authFromLeft 1.4s ease;
+}
+
+#register-form {
+  animation: authFromRight 1.4s ease;
+}
+
+@keyframes authFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-48px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes authFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(48px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+#auth-screen form.is-hidden {
+  display: none;
+}
+
+#auth-screen h2 {
+  margin: 0 0 0.4rem;
+  font-weight: 400;
+  font-size: 1.8rem;
+  color: var(--accent-purple);
+}
+
+#auth-screen input {
+  height: 42px;
+  border: 1px solid #c7c9ca;
+  border-radius: 6px;
+  padding: 0 0.8rem;
+  background: #fff;
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+#auth-screen input:focus {
+  outline: none;
+  border-color: var(--accent-purple);
+}
+
+#auth-screen button[type="submit"] {
+  height: 42px;
+  margin-top: 0.4rem;
+  border: none;
+  border-radius: 6px;
+  background: var(--app-header-bg);
+  color: #fff;
+  font-family: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+#auth-screen button[type="button"] {
+  border: none;
+  background: transparent;
+  color: var(--accent-purple);
+  font-family: inherit;s
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+
+#app-page.is-entering .app {
+  animation: appEnter 0.8s cubic-bezier(0.2, 0.9, 0.3, 1.25);
+}
+
+@keyframes appEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
 
 /* app page */
 .page {

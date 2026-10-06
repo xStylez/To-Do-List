@@ -595,12 +595,16 @@ document.getElementById("login-form").addEventListener("submit", async function(
         return;
     }
     
+    const appPage = document.getElementById("app-page");
     document.getElementById("auth-screen").classList.add("is-hidden");
-    document.getElementById("app-page").classList.remove("is-hidden");
+    appPage.classList.add("is-entering");
+    appPage.classList.remove("is-hidden");
     await loadTodos();
     await loadProjects();
 });
 
+
+// keeps the session alive until timeout ( 30 minutes ) - refresh does not bring you back at auth screen
 async function restoreSession(){
     const me = await fetch("http://127.0.0.1:5000/me");
     if (!me.ok){
